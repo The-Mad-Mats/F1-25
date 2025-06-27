@@ -150,7 +150,7 @@ namespace F1
                         var Driver = driver.Name;
                         var Team = driver.Team;
                         var Grid = driver.m_gridPosition;
-                        var Stops = driver.m_numPitStops;
+                        var Stops = driver.NumberOfPitstops;
                         var Best = TimeSpan.FromMilliseconds(driver.m_bestLapTime).ToString(@"mm\:ss\:fff");
                         TimeSpan span = TimeSpan.FromSeconds(Leader.m_totalRaceTime - (driver.m_totalRaceTime + driver.m_penaltiesTime));
                         TimeSpan leaderspan = TimeSpan.FromSeconds(driver.m_totalRaceTime);
@@ -677,132 +677,140 @@ namespace F1
                 }
                 seasonResults.Add(raceResults);
             }
-            if (seasonResults.Count > 0)
+            try
             {
-                foreach (var seasonResult in seasonResults)
+
+                if (seasonResults.Count > 0)
                 {
-                    foreach (var driver in seasonResult)
+                    foreach (var seasonResult in seasonResults)
                     {
-                        var team = driver[2];
-                        var d1 = driver[1];
-                        var d2 = seasonResult.FirstOrDefault(x => x[2] == team && x[1] != driver[1])[1];
-                        var existingTeam = head2heads.Teams.FirstOrDefault(x => x.Team == team && (x.Driver1 == d1 && x.Driver2 == d2) || (x.Driver1 == d2 && x.Driver2 == d1));
-                        if (existingTeam == null)
+                        foreach (var driver in seasonResult)
                         {
-                            existingTeam = new Head2Head
+                            var team = driver[2];
+                            var d1 = driver[1];
+                            var d2 = seasonResult.FirstOrDefault(x => x[2] == team && x[1] != driver[1])[1];
+                            var existingTeam = head2heads.Teams.FirstOrDefault(x => x.Team == team && (x.Driver1 == d1 && x.Driver2 == d2) || (x.Driver1 == d2 && x.Driver2 == d1));
+                            if (existingTeam == null)
                             {
-                                Team = team,
-                                Driver1 = d1,
-                                Driver2 = d2,
-                            };
-                            head2heads.Teams.Add(existingTeam);
+                                existingTeam = new Head2Head
+                                {
+                                    Team = team,
+                                    Driver1 = d1,
+                                    Driver2 = d2,
+                                };
+                                head2heads.Teams.Add(existingTeam);
+                            }
                         }
-                    }
-                    foreach (var team in head2heads.Teams)
-                    {
-                        var d1s = seasonResult.FirstOrDefault(x => x[1] == team.Driver1 && x[2] == team.Team)?[0];
-                        var d2s = seasonResult.FirstOrDefault(x => x[1] == team.Driver2 && x[2] == team.Team)?[0];
-                        if (d1s == null || d2s == null)
-                            continue;
-                        var d1 = Convert.ToInt32(d1s);
-                        var d2 = Convert.ToInt32(d2s);
-
-                        if (d1 < d2)
+                        foreach (var team in head2heads.Teams)
                         {
-                            team.D1R++;
-                        }
-                        else
-                        {
-                            team.D2R++;
-                        }
-
-                    }
-                }
-
-
-                var filesq = di.GetFiles("*Quali*.txt");
-                var seasonResultsq = new List<List<List<string>>>();
-                foreach (var file in filesq.OrderBy(x => x.Name.Split()[1]))
-                {
-                    numberOfRaces++;
-                    var filePart = file.Name.Split(' ');
-                    var raceResults = new List<List<string>>();
-                    using (StreamReader reader = file.OpenText())
-                    {
-                        while (true)
-                        {
-                            string line = reader.ReadLine();
-                            if (line == null)
-                                break;
-                            var lines = line.Split(',');
-                            if (lines[0] == "Position" || lines[0].StartsWith("Gap"))
+                            var d1s = seasonResult.FirstOrDefault(x => x[1] == team.Driver1 && x[2] == team.Team)?[0];
+                            var d2s = seasonResult.FirstOrDefault(x => x[1] == team.Driver2 && x[2] == team.Team)?[0];
+                            if (d1s == null || d2s == null)
                                 continue;
-                            raceResults.Add(lines.ToList());
+                            var d1 = Convert.ToInt32(d1s);
+                            var d2 = Convert.ToInt32(d2s);
+
+                            if (d1 < d2)
+                            {
+                                team.D1R++;
+                            }
+                            else
+                            {
+                                team.D2R++;
+                            }
+
                         }
                     }
-                    seasonResultsq.Add(raceResults);
-                }
 
 
-                foreach (var seasonResult in seasonResultsq)
-                {
-                    foreach (var team in head2heads.Teams)
+                    var filesq = di.GetFiles("*Quali*.txt");
+                    var seasonResultsq = new List<List<List<string>>>();
+                    foreach (var file in filesq.OrderBy(x => x.Name.Split()[1]))
                     {
-                        var d1s = seasonResult.FirstOrDefault(x => x[1] == team.Driver1 && x[2] == team.Team)?[0];
-                        var d2s = seasonResult.FirstOrDefault(x => x[1] == team.Driver2 && x[2] == team.Team)?[0];
-                        if (d1s == null || d2s == null)
-                            continue;
-                        var d1 = Convert.ToInt32(d1s);
-                        var d2 = Convert.ToInt32(d2s);
-                        if (d1 < d2)
+                        numberOfRaces++;
+                        var filePart = file.Name.Split(' ');
+                        var raceResults = new List<List<string>>();
+                        using (StreamReader reader = file.OpenText())
                         {
-                            team.D1Q++;
+                            while (true)
+                            {
+                                string line = reader.ReadLine();
+                                if (line == null)
+                                    break;
+                                var lines = line.Split(',');
+                                if (lines[0] == "Position" || lines[0].StartsWith("Gap"))
+                                    continue;
+                                raceResults.Add(lines.ToList());
+                            }
                         }
-                        else
-                        {
-                            team.D2Q++;
-                        }
-
+                        seasonResultsq.Add(raceResults);
                     }
+
+
+                    foreach (var seasonResult in seasonResultsq)
+                    {
+                        foreach (var team in head2heads.Teams)
+                        {
+                            var d1s = seasonResult.FirstOrDefault(x => x[1] == team.Driver1 && x[2] == team.Team)?[0];
+                            var d2s = seasonResult.FirstOrDefault(x => x[1] == team.Driver2 && x[2] == team.Team)?[0];
+                            if (d1s == null || d2s == null)
+                                continue;
+                            var d1 = Convert.ToInt32(d1s);
+                            var d2 = Convert.ToInt32(d2s);
+                            if (d1 < d2)
+                            {
+                                team.D1Q++;
+                            }
+                            else
+                            {
+                                team.D2Q++;
+                            }
+
+                        }
+                    }
+
+                    var dt = new DataTable();
+                    dt.Columns.Add("Team");
+                    dt.Columns.Add("Driver 1");
+                    dt.Columns.Add("Qualify D1");
+                    dt.Columns.Add("Qualify D2");
+                    dt.Columns.Add("Driver 2");
+
+                    foreach (var row in head2heads.Teams)
+                    {
+                        var l = new List<string>();
+                        l.Add(row.Team);
+                        l.Add(row.Driver1);
+                        l.Add(row.D1Q.ToString());
+                        l.Add(row.D2Q.ToString());
+                        l.Add(row.Driver2);
+                        dt.Rows.Add(l.ToArray());
+                    }
+                    QualifyingH2H = dt;
+
+                    var dtr = new DataTable();
+                    dtr.Columns.Add("Team");
+                    dtr.Columns.Add("Driver 1");
+                    dtr.Columns.Add("Race D1");
+                    dtr.Columns.Add("Race D2");
+                    dtr.Columns.Add("Driver 2");
+
+                    foreach (var row in head2heads.Teams)
+                    {
+                        var l = new List<string>();
+                        l.Add(row.Team);
+                        l.Add(row.Driver1);
+                        l.Add(row.D1R.ToString());
+                        l.Add(row.D2R.ToString());
+                        l.Add(row.Driver2);
+                        dtr.Rows.Add(l.ToArray());
+                    }
+                    RaceH2H = dtr;
                 }
+            }
+            catch (Exception)
+            {
 
-                var dt = new DataTable();
-                dt.Columns.Add("Team");
-                dt.Columns.Add("Driver 1");
-                dt.Columns.Add("Qualify D1");
-                dt.Columns.Add("Qualify D2");
-                dt.Columns.Add("Driver 2");
-
-                foreach (var row in head2heads.Teams)
-                {
-                    var l = new List<string>();
-                    l.Add(row.Team);
-                    l.Add(row.Driver1);
-                    l.Add(row.D1Q.ToString());
-                    l.Add(row.D2Q.ToString());
-                    l.Add(row.Driver2);
-                    dt.Rows.Add(l.ToArray());
-                }
-                QualifyingH2H = dt;
-
-                var dtr = new DataTable();
-                dtr.Columns.Add("Team");
-                dtr.Columns.Add("Driver 1");
-                dtr.Columns.Add("Race D1");
-                dtr.Columns.Add("Race D2");
-                dtr.Columns.Add("Driver 2");
-
-                foreach (var row in head2heads.Teams)
-                {
-                    var l = new List<string>();
-                    l.Add(row.Team);
-                    l.Add(row.Driver1);
-                    l.Add(row.D1R.ToString());
-                    l.Add(row.D2R.ToString());
-                    l.Add(row.Driver2);
-                    dtr.Rows.Add(l.ToArray());
-                }
-                RaceH2H = dtr;
             }
         }
         private void ReadRaceResult()

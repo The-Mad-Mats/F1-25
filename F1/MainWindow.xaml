@@ -254,6 +254,7 @@
                         </DataGridTemplateColumn>
                         <DataGridTextColumn Header="CornerCutting" Binding="{Binding CornerCuts}"  Width="Auto" FontSize="24" CellStyle="{StaticResource CornerCutCellStyle}"/>
                         <DataGridTextColumn Header="Penalties" Binding="{Binding Penalties}"  Width="Auto" FontSize="24"/>
+                        <DataGridTextColumn Header="Nr Pits" Binding="{Binding NumberOfPitstops}"  Width="Auto" FontSize="24"/>
                         <DataGridTemplateColumn Header="Pits" Width="30" IsReadOnly="True">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>

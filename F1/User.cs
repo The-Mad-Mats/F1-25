@@ -841,7 +841,7 @@ namespace F1
         public int m_numLaps { get; set; }               // Number of laps completed
         public int m_gridPosition { get; set; }          // Grid position of the car
         public int m_points { get; set; }                // Number of points scored
-        public int m_numPitStops { get; set; }           // Number of pit stops made
+        public int NumberOfPitstops { get; set; }           // Number of pit stops made
         public int m_resultStatus { get; set; }          // Result status - 0 = invalid, 1 = inactive, 2 = active
                                                           // 3 = finished, 4 = disqualified, 5 = not classified
                                                           // 6 = retired

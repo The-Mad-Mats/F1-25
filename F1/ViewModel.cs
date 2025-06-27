@@ -771,6 +771,7 @@ namespace F1
                                         userList[index].CarPosition = ld.m_carPosition;
                                         userList[index].LapNum = ld.m_currentLapNum;
                                         userList[index].Pits = ld.m_pitStatus.ToString();
+                                        userList[index].NumberOfPitstops = ld.m_numPitStops;
                                         userList[index].Penalties = ld.m_penalties.ToString();
                                         userList[index].ResultStatus = ld.m_resultStatus.ToString();
                                         userList[index].Session = _session;
@@ -998,7 +999,7 @@ namespace F1
                                         userList[index].m_points = sd.m_points;
                                         userList[index].m_numLaps = sd.m_numLaps;
                                         userList[index].m_gridPosition = sd.m_gridPosition;
-                                        userList[index].m_numPitStops = sd.m_numPitStops;
+                                        userList[index].NumberOfPitstops = sd.m_numPitStops;
                                         userList[index].m_resultStatus = sd.m_resultStatus;
                                         userList[index].BestLapTime = sd.m_bestLapTime.ToString();
                                         userList[index].TotalRaceTime = sd.m_totalRaceTime.ToString();
